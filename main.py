@@ -14,7 +14,7 @@ scraper = Scraper()
 bot = TelegramBot()
 
 
-def get_message(appointments, send_message=False):
+def get_message(appointments):
     logging.debug(appointments)
     free_appointments = []
     for date in appointments:
@@ -24,16 +24,15 @@ def get_message(appointments, send_message=False):
             logging.info(date, value)
 
     if len(free_appointments) == 0:
-        message = f"Unfortunately I couldn't find any free appointment :( but I will keep you updated in {INTERVAL} mins."
+        message = f"Nothing free - checking again in {INTERVAL} mins"
         logging.debug(message)
+        # bot.send_message(message)  # ONLY FOR DEBUGGING
 
     else:
         url = "https://www46.muenchen.de/termin/index.php"
         message = f"I found these: {free_appointments}. Get your appointment here: {url}"
-        send_message = True
         logging.debug(message)
-
-    return message, send_message
+        bot.send_message(message)
 
 
 def get_appointments():
@@ -52,16 +51,24 @@ def get_appointments():
         counter += 1
 
 
-@scheduler.scheduled_job(CronTrigger(minute=f"*/{INTERVAL}", hour='*', day='*', month='*', day_of_week='*'))
+@scheduler.scheduled_job(CronTrigger(minute=f"*/{INTERVAL}", hour='6-22', day='*', month='*', day_of_week='*'))
 def check_appointment():
     logging.info('Starting scheduled job...')
     appointments = get_appointments()
-    message, send_message = get_message(appointments)
-    if send_message:
-        bot.send_message(message)
+    get_message(appointments)
+
+
+@scheduler.scheduled_job(CronTrigger(minute="0", hour='7', day='*', month='*', day_of_week='*'))
+def latest_appointment():
+    logging.info('Starting scheduled job...')
+    appointments = get_appointments()
+    message = f"Daily Update\nLast KVR appointment: {max(appointments.keys())}"
+    logging.debug(message)
+    bot.send_message(message)
 
 
 if __name__ == "__main__":
     logging.info('Initializing...')
     scheduler.add_job(check_appointment)
+    scheduler.add_job(latest_appointment)
     scheduler.start()
