@@ -9,6 +9,7 @@ from requests import Session
 
 load_dotenv(dotenv_path='.env')
 appointment = quote(os.environ['APPOINTMENT_TYPE'])
+appointment_code = str(os.environ['APPOINTMENT_CODE'])
 num = os.environ.get('APPOINTMENT_QUANTITY', 1)
 
 
@@ -19,7 +20,7 @@ class Scraper:
 
         # Request params
         self.url = "https://www46.muenchen.de/termin/index.php"
-        self.querystring = {"cts": "1080627"}
+        self.querystring = {"cts": appointment_code}
         self.payload = f"step=WEB_APPOINT_SEARCH_BY_CASETYPES&{appointment}={num}"
         self.headers = {
             'Connection': "keep-alive",
@@ -42,7 +43,7 @@ class Scraper:
 
         # Get real data
         response = self.session.request(
-            "POST", self.url, data=self.payload, headers=self.headers)  # , params=self.querystring)
+            "POST", self.url, data=self.payload, headers=self.headers, params=self.querystring)
         return response.text
 
     def __scrape_html(self, html):
