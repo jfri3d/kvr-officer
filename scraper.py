@@ -54,7 +54,10 @@ class Scraper:
             regex=regex, text=script_tag)
 
         appointments = json.loads(appointments_text)
-        return appointments["Termin Wartezone SCIF"]["appoints"]
+        apts = {}
+        for k, v in appointments.items():
+            apts[k] = appointments[k]["appoints"]
+        return apts
 
     @staticmethod
     def __find_json_object(regex, text):

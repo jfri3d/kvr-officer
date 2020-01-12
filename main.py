@@ -17,11 +17,12 @@ bot = TelegramBot()
 def get_message(appointments):
     logging.debug(appointments)
     free_appointments = []
-    for date in appointments:
-        value = appointments[date]
-        if len(value) > 0:
-            free_appointments.append(date)
-            logging.info(date, value)
+    for k, _ in appointments.items():
+        for date in appointments[k]:
+            value = appointments[k][date]
+            if len(value) > 0:
+                free_appointments.append(f"{k} - {date} @ {value}")
+                logging.info(f"Found {k} - {date} @ {value}")
 
     if len(free_appointments) == 0:
         message = f"Nothing free - checking again in {INTERVAL} mins"
@@ -62,7 +63,8 @@ def check_appointment():
 def latest_appointment():
     logging.info('Starting scheduled job...')
     appointments = get_appointments()
-    message = f"Daily Update\nLast KVR appointment: {max(appointments.keys())}"
+    last_appointments = [(k, max(v.keys())) for k, v in appointments.items()]
+    message = f"Daily Update\nLast KVR appointment: {last_appointments}"
     logging.debug(message)
     bot.send_message(message)
 
