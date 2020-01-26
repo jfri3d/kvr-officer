@@ -52,14 +52,14 @@ def get_appointments():
         counter += 1
 
 
-@scheduler.scheduled_job(CronTrigger(minute=f"*/{INTERVAL}", hour='4-23', day='*', month='*', day_of_week='*'))
+@scheduler.scheduled_job(CronTrigger(minute=f"*/{INTERVAL}", hour='*', day='*', month='*', day_of_week='*'))
 def check_appointment():
     logging.info('Starting scheduled job...')
     appointments = get_appointments()
     get_message(appointments)
 
 
-@scheduler.scheduled_job(CronTrigger(minute="0", hour='7', day='*', month='*', day_of_week='*'))
+@scheduler.scheduled_job(CronTrigger(minute="0", hour='6', day='*', month='*', day_of_week='*'))
 def latest_appointment():
     logging.info('Starting scheduled job...')
     appointments = get_appointments()

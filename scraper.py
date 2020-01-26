@@ -19,7 +19,7 @@ class Scraper:
         self.session = Session()
 
         # Request params
-        self.url = "https://www46.muenchen.de/termin/index.php"
+        self.url = "https://www46.muenchen.de/view-abh/termin/index.php"
         self.querystring = {"cts": appointment_code}
         self.payload = f"step=WEB_APPOINT_SEARCH_BY_CASETYPES&{appointment}={num}"
         self.headers = {
